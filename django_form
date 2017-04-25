@@ -1,0 +1,10 @@
+{{ form.fields.tags }}
+{% for tag in form.fields.tags.choices %}
+    <p>{{ tag }}</p>
+{% endfor %}
+{% for tag in form.fields.tags.queryset %}
+    <p>{{ tag }}</p>
+{% endfor %}
+{% for tag in form.tags.value %}
+    <p>{{ tag }}</p>
+{% endfor %}
