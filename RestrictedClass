@@ -1,0 +1,27 @@
+class RestrictedListView(ListView):
+    permissions = None
+    superuser_allowed = True
+    redirect_url = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+
+    def dispatch(self, request, *args, **kwargs):
+        handler = super().dispatch(request, *args, **kwargs)
+        print (self.superuser_allowed)
+
+        def forbidden():
+            if self.redirect_url is None:
+                return HttpResponseForbidden()
+            return HttpResponseRedirect(self.redirect_url)
+
+        if not request.user.is_authenticated():
+            return forbidden()
+        if (request.user.is_superuser and self.superuser_allowed) or self.permissions is None:
+            return handler
+        else:
+            user_permissions = request.user.user_permissions.values_list('codename', flat=True)
+            for permission in self.permissions:
+                if permission in user_permissions:
+                    return handler
+            return forbidden()
